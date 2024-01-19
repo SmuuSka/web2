@@ -20,7 +20,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
         }
 
         delete user.password; // this is the reason for partial
-        const token = jwt.sign(user, 'asdf');
+        const token = jwt.sign(user, process.env.JWT_SECRET!);
         return res.json({user, token});
       });
     }

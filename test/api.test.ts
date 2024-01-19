@@ -109,7 +109,7 @@ describe('GET /api/v1', () => {
     await userPutCat(app, token, catID);
   });
 
-  // test delete user's cat
+  //test delete user's cat
   it('should delete a cat', async () => {
     await userDeleteCat(app, token, catID);
   });
@@ -125,7 +125,7 @@ describe('GET /api/v1', () => {
     catID = message.id!;
   });
 
-  // test delete user based on token
+  //test delete user based on token
   it('should delete current user', async () => {
     await deleteUser(app, token);
   });

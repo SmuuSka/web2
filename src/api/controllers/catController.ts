@@ -47,7 +47,11 @@ const catGet = async (req: Request, res: Response<Cat>, next: NextFunction) => {
 };
 
 // TODO: create catPost function to add new cat
-
+// catPost should use addCat function from catModel
+// catPost should use validationResult to validate req.body
+// catPost should use req.file to get filename
+// catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
+// catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
 const catPost = async (
   req: Request<{}, {}, Omit<Cat, 'owner'> & {owner: number}>,
   res: Response<MessageResponse, {coords: [number, number]}>,
@@ -63,26 +67,45 @@ const catPost = async (
     next(new CustomError(messages, 400));
     return;
   }
+
   try {
-    // catPost should use addCat function from catModel
-    // catPost should use validationResult to validate req.body
-    // catPost should use req.file to get filename
-    // catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
-    // catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
-    const cat = req.body;
-    //const result = await addCat(cat);
-    //res.json(result);
+    if (!req.file) {
+      throw new CustomError('File is missing', 400);
+      return;
+    }
+    const filename = req.file.filename;
+    const [lat, lng] = res.locals.coords;
+    const {user_id, role} = req.user as User;
+
+    const cat: Omit<Cat, 'owner'> & {
+      owner: number;
+      filename: string;
+      lat: number;
+      lng: number;
+      user_id: number;
+      role: string;
+    } = {
+      ...req.body,
+      owner: user_id,
+      filename,
+      lat,
+      lng,
+      user_id,
+      role,
+    };
+    const result = await addCat(cat);
+    res.json(result);
   } catch (error) {
     next(error);
   }
 };
 
 const catPut = async (
-  req: Request<{id: string}, {}, Cat>,
+  req: Request<{id: number}, {}, Cat>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req);
+  const errors = validationResult(req.params);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
@@ -95,8 +118,8 @@ const catPut = async (
 
   try {
     const id = Number(req.params.id);
-    const cat = req.body;
-    const result = await updateCat(cat, id); // Remove the extra arguments
+    const cat = req.body as Cat;
+    const result = await updateCat(cat, id);
     res.json(result);
   } catch (error) {
     next(error);
@@ -107,11 +130,11 @@ const catPut = async (
 // catDelete should use deleteCat function from catModel
 // catDelete should use validationResult to validate req.params.id
 const catDelete = async (
-  req: Request<{id: string}, {}, Cat>,
+  req: Request<{id: number}, {}, {}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req);
+  const errors = validationResult(req.params);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
