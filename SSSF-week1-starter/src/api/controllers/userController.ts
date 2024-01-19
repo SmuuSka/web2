@@ -28,7 +28,7 @@ const userListGet = async (
 };
 
 const userGet = async (
-  req: Request<{id: string}, {}, {}>,
+  req: Request<{id: string}>,
   res: Response<User>,
   next: NextFunction
 ) => {
@@ -50,7 +50,7 @@ const userGet = async (
 // userPost should use bcrypt to hash password
 
 const userPost = async (
-  req: Request<{}, {}, User>,
+  req: Request<User>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
@@ -90,7 +90,7 @@ const userPost = async (
 };
 
 const userPut = async (
-  req: Request<{id: number}, {}, User>,
+  req: Request<{id: User}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
@@ -110,7 +110,7 @@ const userPut = async (
     if (user && user.role !== 'admin') {
       throw new CustomError('Admin only', 403);
     }
-    const result = await updateUser(user, req.params.id);
+    const result = await updateUser(user, Number(req.params.id));
 
     res.json(result);
   } catch (error) {
@@ -152,23 +152,24 @@ const userPutCurrent = async (
 // userDelete should use validationResult to validate req.params.id
 // userDelete should use req.user to get role
 const userDelete = async (
-  req: Request<{id: number}, {}, User>,
+  req: Request<{id: User}, {}, User>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req.params);
+  const errors = validationResult(req.params.id);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('user_post validation', messages);
+    console.log('userDelete validation', messages);
     next(new CustomError(messages, 400));
     return;
   }
 
   try {
-    if (!(req.user as User).user_id && (req.user as User).role !== 'admin') {
+    const user = req.user;
+    if (!user && user!.role !== 'admin') {
       throw new CustomError('No user nor admin', 400);
     }
     const result = await deleteUser((req.user as User).user_id);
@@ -180,7 +181,7 @@ const userDelete = async (
 };
 
 const userDeleteCurrent = async (
-  req: Request<{id: number}, {}, User>,
+  req: Request<{id: number}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
@@ -190,15 +191,16 @@ const userDeleteCurrent = async (
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('user_post validation', messages);
+    console.log('userDeleteCurrent validation', messages);
     next(new CustomError(messages, 400));
     return;
   }
   try {
-    if (!(req.user as User).user_id) {
+    const user = req.user;
+    if (!user!.user_id) {
       throw new CustomError('No user', 400);
     }
-    const result = await deleteUser((req.user as User).user_id);
+    const result = await deleteUser(user!.user_id);
 
     res.json(result);
   } catch (error) {

@@ -1,7 +1,7 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
-import {Cat} from '../../types/DBTypes';
+import {Cat, User} from '../../types/DBTypes';
 import {MessageResponse, UploadResponse} from '../../types/MessageTypes';
 
 const getAllCats = async (): Promise<Cat[]> => {
@@ -82,12 +82,21 @@ const addCat = async (
 
 const updateCat = async (
   data: Cat,
-  catId: number
+  catId: number,
+  user: User
 ): Promise<MessageResponse> => {
-  const sql = promisePool.format('UPDATE sssf_cat SET ? WHERE cat_id = ?;', [
-    data,
-    catId,
-  ]);
+  let sql;
+  if (user.role! !== 'admin') {
+    sql = promisePool.format(
+      'UPDATE sssf_cat SET ? WHERE cat_id = ? AND owner = ?;',
+      [data, catId, user.user_id]
+    );
+  } else {
+    sql = promisePool.format('UPDATE sssf_cat SET ? WHERE cat_id = ?;', [
+      data,
+      catId,
+    ]);
+  }
   const [headers] = await promisePool.execute<ResultSetHeader>(sql);
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats updated', 400);

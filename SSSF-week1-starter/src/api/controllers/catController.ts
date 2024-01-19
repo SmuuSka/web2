@@ -101,11 +101,11 @@ const catPost = async (
 };
 
 const catPut = async (
-  req: Request<{id: number}, {}, Cat>,
+  req: Request<{id: Cat}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req.params);
+  const errors = validationResult(req.params.id);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
@@ -119,7 +119,7 @@ const catPut = async (
   try {
     const id = Number(req.params.id);
     const cat = req.body as Cat;
-    const result = await updateCat(cat, id);
+    const result = await updateCat(cat, id, req.user as User);
     res.json(result);
   } catch (error) {
     next(error);
@@ -130,11 +130,11 @@ const catPut = async (
 // catDelete should use deleteCat function from catModel
 // catDelete should use validationResult to validate req.params.id
 const catDelete = async (
-  req: Request<{id: number}, {}, {}>,
+  req: Request<{id: Cat}, {}, {}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req.params);
+  const errors = validationResult(req.params.id);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
