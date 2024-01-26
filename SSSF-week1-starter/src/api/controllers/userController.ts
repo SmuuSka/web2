@@ -168,9 +168,9 @@ const userDelete = async (
   }
 
   try {
-    const user = req.user;
-    if (!user && user!.role !== 'admin') {
-      throw new CustomError('No user nor admin', 400);
+    const user = req.user as User;
+    if (!user.user_id) {
+      throw new CustomError('No user', 400);
     }
     const result = await deleteUser((req.user as User).user_id);
 
@@ -196,7 +196,7 @@ const userDeleteCurrent = async (
     return;
   }
   try {
-    const user = req.user;
+    const user = req.user as User;
     if (!user!.user_id) {
       throw new CustomError('No user', 400);
     }
