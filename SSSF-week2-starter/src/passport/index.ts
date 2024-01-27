@@ -2,7 +2,7 @@ import passport from 'passport';
 import {Strategy} from 'passport-local';
 import {Strategy as JWTStrategy, ExtractJwt} from 'passport-jwt';
 import bcrypt from 'bcryptjs';
-import userModel from '../../src/api/models/userModel';
+import userModel from '../api/models/userModel';
 import {LoginUser} from '../interfaces/User';
 
 passport.use(
@@ -30,7 +30,7 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'asdf',
+      secretOrKey: process.env.JWT_SECRET!,
     },
     (jwtPayload, done) => {
       done(null, jwtPayload);

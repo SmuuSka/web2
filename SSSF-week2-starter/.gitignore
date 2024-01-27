@@ -76,3 +76,5 @@ dist
 
 uploads/*
 !uploads/.gitkeep
+#env
+env

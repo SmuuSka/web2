@@ -21,7 +21,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
         email: user.email,
       };
 
-      const token = jwt.sign(user, 'asdf');
+      const token = jwt.sign(user, process.env.JWT_SECRET!);
       return res.json({user: outputUser, token});
     });
   })(req, res, next);
