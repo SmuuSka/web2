@@ -16,9 +16,10 @@ import {
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
-import {User} from '../../interfaces/User';
+import {User, UserTest} from '../../interfaces/User';
 import MessageResponse from '../../interfaces/MessageResponse';
 import {validationResult} from 'express-validator';
+import DBMessageResponse from '../../interfaces/DBMessageResponse';
 const salt = bcrypt.genSaltSync(12);
 
 const userListGet = async (
@@ -29,6 +30,7 @@ const userListGet = async (
   try {
     const users = await getAllUsers();
     console.log('userListGet', users);
+    res.json(users);
   } catch (error) {
     next(error);
   }
@@ -48,11 +50,11 @@ const userGet = async (
   }
 };
 const userPost = async (
-  req: Request<User>,
-  res: Response<MessageResponse>,
+  req: Request<{}, {}, User>,
+  res: Response<DBMessageResponse>,
   next: NextFunction
 ) => {
-  const errors = validationResult(req.body);
+  const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
@@ -64,24 +66,19 @@ const userPost = async (
   }
 
   try {
-    if (!req.body.role) {
-      req.body.role = 'user';
-    }
-    if (req.body.user_name.length < 3) {
-      throw new CustomError('Username too short', 400);
-    }
-    if (req.body.password.length < 5) {
-      throw new CustomError('Password too short', 400);
-    }
-    if (!req.body.email.includes('@')) {
-      throw new CustomError('Email not valid', 400);
-    }
-    const user = req.body;
-    user.password = bcrypt.hashSync(user.password, salt);
-
+    const user = req.body as User;
+    user.password = bcrypt.hashSync(req.body.password, salt);
     const result = await addUser(user);
-    console.log('userPost', result);
+    res.status(200).json({
+      message: 'User added',
+      data: {
+        _id: result._id,
+        user_name: result.user_name,
+        email: result.email,
+      },
+    });
   } catch (error) {
+    res.status(400);
     next(error);
   }
 };
@@ -165,9 +162,6 @@ const userDelete = async (
 
   try {
     const user = req.user as User;
-    if (!user || user.role !== 'admin') {
-      throw new CustomError('No user nor admin', 400);
-    }
     const result = await deleteUser((req.user as User)._id);
     console.log('userDelete', result);
   } catch (error) {
@@ -176,7 +170,7 @@ const userDelete = async (
 };
 
 const userDeleteCurrent = async (
-  req: Request<{id: number}>,
+  req: Request,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
@@ -203,10 +197,24 @@ const userDeleteCurrent = async (
 };
 
 const checkToken = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    next(new CustomError('token not valid', 403));
-  } else {
-    res.json(req.user);
+  const errors = validationResult(req.body);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('userToken validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
+  try {
+    const user = req.user as User;
+    if (!user) {
+      throw new CustomError('No user', 400);
+    }
+  } catch (error) {
+    next(error);
   }
 };
 

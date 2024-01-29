@@ -21,5 +21,10 @@ interface LoginUser {
   iat: number;
   exp: number;
 }
+interface UserTest {
+  user_name: string;
+  email: string;
+  password: string;
+}
 
-export {User, UserOutput, LoginUser};
+export {User, UserOutput, LoginUser, UserTest};

@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import {User} from '../../interfaces/User';
 
 const userSchema = new mongoose.Schema({
-  username: {
+  user_name: {
     type: String,
     required: true,
     unique: true,
@@ -21,8 +21,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 3,
-    maxlength: 20,
+    minlength: 5,
+    maxlength: 100,
   },
   role: {
     type: String,
@@ -32,12 +32,22 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const userModelVariable = mongoose.model('User', userSchema);
+const userModelVariable = mongoose.model<User>('User', userSchema);
 
 const addUser = async (user: User) => {
   await mongoConnect();
-  const newUser = new userModelVariable(user);
-  return newUser.save();
+  const newUser = new userModelVariable(
+    {
+      user_name: user.user_name,
+      email: user.email,
+      password: user.password,
+    },
+    {versionKey: false}
+  );
+  await newUser.save().catch((error) => {
+    console.log(error);
+  });
+  return newUser;
 };
 const getAllUsers = async () => {
   await mongoConnect();

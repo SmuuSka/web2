@@ -56,7 +56,7 @@ const postUser = (
   return new Promise((resolve, reject) => {
     request(url)
       .post('/api/v1/users/')
-      .set('Content-type', 'application/json')
+      .set('Content-Type', 'application/json')
       .send(user)
       .expect('Content-Type', /json/)
       .expect(200, (err, response) => {
