@@ -171,7 +171,7 @@ const userDelete = async (
 
 const userDeleteCurrent = async (
   req: Request,
-  res: Response<MessageResponse>,
+  res: Response<DBMessageResponse>,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -185,12 +185,15 @@ const userDeleteCurrent = async (
     return;
   }
   try {
-    const user = req.user as User;
-    if (!user!._id) {
-      throw new CustomError('No user', 400);
-    }
-    const result = await deleteUser(user!._id);
-    console.log('userDeleteCurrent', result);
+    const result = await deleteUser(res.locals.user._id);
+    res.json({
+      message: 'User deleted',
+      data: {
+        _id: result!._id,
+        user_name: result!.user_name,
+        email: result!.email,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -209,10 +212,11 @@ const checkToken = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const user = req.user as User;
+    const user = req.user;
     if (!user) {
       throw new CustomError('No user', 400);
     }
+    return user;
   } catch (error) {
     next(error);
   }

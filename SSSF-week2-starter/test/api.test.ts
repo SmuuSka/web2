@@ -88,7 +88,7 @@ describe('GET /api/v1', () => {
   //   await putUser(app, token);
   // });
   //
-  // // test get current user based on token
+  // test get current user based on token
   // it('should return current user', async () => {
   //   await getCurrentUser(app, token);
   // });
@@ -169,8 +169,8 @@ describe('GET /api/v1', () => {
   //   await userDeleteCat(app, token, catID2);
   // });
   //
-  // test delete user based on token
-  // it('should delete current user', async () => {
-  //   await deleteUser(app, token);
-  // });
+  //test delete user based on token
+  it('should delete current user', async () => {
+    await deleteUser(app, token);
+  });
 });

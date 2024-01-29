@@ -96,7 +96,6 @@ const authenticate = async (
   next: NextFunction
 ) => {
   try {
-    console.log('authenticate', req.headers);
     const bearer = req.headers.authorization;
     if (!bearer) {
       next(new CustomError('No token provided', 401));
@@ -109,7 +108,6 @@ const authenticate = async (
       next(new CustomError('No token provided', 401));
       return;
     }
-    console.log('token valid', token);
     const tokenContent = jwt.verify(
       token,
       process.env.JWT_SECRET as string

@@ -15,15 +15,11 @@ const login = (req: Request, res: Response, next: NextFunction) => {
         next(new CustomError('Login error', 400));
         return;
       }
-      console.log('from authController user: ', user);
       const outputUser: UserOutput = {
         _id: user._id,
         user_name: user.user_name,
         email: user.email,
       };
-
-      console.log('from authController userOutput: ', outputUser);
-
       const token = jwt.sign(user, process.env.JWT_SECRET!);
       return res.json({user: outputUser, token});
     });
