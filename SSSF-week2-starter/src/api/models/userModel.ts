@@ -2,14 +2,15 @@
 import mongoConnect from '../../utils/db';
 import mongoose from 'mongoose';
 import {User} from '../../interfaces/User';
+import ErrorResponse from '../../interfaces/ErrorResponse';
 
 const userSchema = new mongoose.Schema({
   user_name: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
     minlength: 3,
-    maxlength: 20,
+    maxlength: 100,
   },
   email: {
     type: String,
@@ -21,6 +22,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    unique: false,
     minlength: 5,
     maxlength: 100,
   },
@@ -61,7 +63,8 @@ const getUser = async (id: number) => {
 
 const updateUser = async (data: Partial<User>, id: number) => {
   await mongoConnect();
-  return userModelVariable.findByIdAndUpdate(id, data);
+  const user = userModelVariable.findByIdAndUpdate(id, data, {new: true});
+  return user;
 };
 
 const deleteUser = async (id: number) => {

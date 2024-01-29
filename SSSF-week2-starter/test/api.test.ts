@@ -72,26 +72,26 @@ describe('GET /api/v1', () => {
     });
     token = user.token;
   });
-  //
-  // //test get all users
-  // it('should return array of users', async () => {
-  //   await getUser(app);
-  // });
-  //
-  // //test get single user
-  // it('should return single user', async () => {
-  //   await getSingleUser(app, user.user._id);
-  // });
-  //
-  // // test update user
-  // it('should update user', async () => {
-  //   await putUser(app, token);
-  // });
-  //
-  // test get current user based on token
-  // it('should return current user', async () => {
-  //   await getCurrentUser(app, token);
-  // });
+
+  //test get all users
+  it('should return array of users', async () => {
+    await getUser(app);
+  });
+
+  //test get single user
+  it('should return single user', async () => {
+    await getSingleUser(app, user.user._id);
+  });
+
+  // test update user
+  it('should update user', async () => {
+    await putUser(app, token);
+  });
+
+  //test get current user based on token
+  it('should return current user', async () => {
+    await getCurrentUser(app, token);
+  });
 
   // // test cat upload without GPS
   // let catID: string;
@@ -139,16 +139,16 @@ describe('GET /api/v1', () => {
   //   catID3 = message.data._id;
   // });
 
-  // login as admin
-  // let adminToken: string;
-  // it('should login as admin', async () => {
-  //   const user = await postAuthLogin(app, {
-  //     username: 'admin@metropolia.fi',
-  //     password: '1234',
-  //   });
-  //   adminToken = user.token;
-  // });
-  //
+  //login as admin
+  let adminToken: string;
+  it('should login as admin', async () => {
+    const user = await postAuthLogin(app, {
+      username: 'admin@metropolia.fi',
+      password: '1234',
+    });
+    adminToken = user.token;
+  });
+
   // // test modify user's cat as admin
   // it('should modify a cat as admin', async () => {
   //   await adminPutCat(app, adminToken, catID3);

@@ -157,7 +157,7 @@ const postAuthLoginError = (url: string | Function): Promise<ErrorResponse> => {
         username: 'wrong@example.com',
         password: 'wrongpassword',
       })
-      .expect(200, (err, response) => {
+      .expect(400, (err, response) => {
         if (err) {
           reject(err);
         } else {

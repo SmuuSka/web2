@@ -16,7 +16,7 @@ import {
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
-import {User, UserTest} from '../../interfaces/User';
+import {User, UserOutput} from '../../interfaces/User';
 import MessageResponse from '../../interfaces/MessageResponse';
 import {validationResult} from 'express-validator';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
@@ -29,22 +29,34 @@ const userListGet = async (
 ) => {
   try {
     const users = await getAllUsers();
-    console.log('userListGet', users);
-    res.json(users);
+    const _users: User[] = [];
+    for (const user of users) {
+      const _user = {
+        _id: user._id,
+        user_name: user.user_name,
+        email: user.email,
+      };
+      _users.push(_user as User);
+    }
+    res.json(_users);
   } catch (error) {
     next(error);
   }
 };
 
 const userGet = async (
-  req: Request<{id: string}>,
-  res: Response<User>,
+  req: Request<{id: number}>,
+  res: Response,
   next: NextFunction
 ) => {
   try {
-    const id = Number(req.params.id);
-    const user = await getUser(id);
-    console.log('userGet', user);
+    const user = await getUser(req.params.id);
+    const _user = {
+      _id: user!._id,
+      user_name: user!.user_name,
+      email: user!.email,
+    };
+    res.json(_user);
   } catch (error) {
     next(error);
   }
@@ -115,8 +127,8 @@ const userPut = async (
 // userPutCurrent should use updateUser function from userModel
 // userPutCurrent should use validationResult to validate req.body
 const userPutCurrent = async (
-  req: Request<{}, {}, User>,
-  res: Response<MessageResponse>,
+  req: Request,
+  res: Response<DBMessageResponse>,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -128,13 +140,18 @@ const userPutCurrent = async (
     next(new CustomError(messages, 400));
     return;
   }
-  const user = req.user;
-  if (!user) {
-    throw new CustomError('No user', 400);
-  }
+  const user = req.body as User;
+  console.log('userPutCurrent', user);
   try {
-    const result = await updateUser(req.body, (req.user as User)._id);
-    console.log('userPutCurrent', result);
+    const result = await updateUser(user, res.locals.user._id);
+    res.json({
+      message: 'User updated',
+      data: {
+        _id: result!._id,
+        user_name: result!.user_name,
+        email: result!.email,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -212,11 +229,13 @@ const checkToken = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const user = req.user;
-    if (!user) {
-      throw new CustomError('No user', 400);
-    }
-    return user;
+    const user = res.locals.user as UserOutput;
+    const _user = {
+      _id: user._id,
+      user_name: user.user_name,
+      email: user.email,
+    };
+    res.json(_user);
   } catch (error) {
     next(error);
   }

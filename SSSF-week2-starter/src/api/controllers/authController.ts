@@ -7,7 +7,9 @@ import {User, UserOutput} from '../../interfaces/User';
 const login = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('local', {session: false}, (err: Error, user: User) => {
     if (err || !user) {
-      next(new CustomError('Invalid username/password', 200));
+      next(
+        new CustomError('Invalid username/password: ' + user.user_name, 400)
+      );
       return;
     }
     req.login(user, {session: false}, (error) => {
