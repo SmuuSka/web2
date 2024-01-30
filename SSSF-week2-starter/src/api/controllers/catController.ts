@@ -15,7 +15,13 @@ import {User} from '../../interfaces/User';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import {validationResult} from 'express-validator';
 import CustomError from '../../classes/CustomError';
-import {addCat, getCat, deleteCat, getAllCats} from '../models/catModel';
+import {
+  addCat,
+  getCat,
+  deleteCat,
+  getAllCats,
+  updateCat,
+} from '../models/catModel';
 import MessageResponse from '../../interfaces/MessageResponse';
 import {getUser} from '../models/userModel';
 
@@ -145,6 +151,127 @@ const catGetByUser = async (
   }
 };
 
+const catGetByBoundingBox = async (
+  req: Request,
+  res: Response<Cat[]>,
+  next: NextFunction
+) => {
+  const errors = validationResult(req.body);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    next(new CustomError(messages, 400));
+    return;
+  }
+  try {
+    const getCoordinate = (coordinateString: string, index: number): number => {
+      return parseFloat(coordinateString.split(',')[index]);
+    };
+
+    const topRightMax = getCoordinate(req.query.topRight as string, 0);
+    const topRightMin = getCoordinate(req.query.topRight as string, 1);
+
+    const bottomLeftMax = getCoordinate(req.query.bottomLeft as string, 0);
+    const bottomLeftMin = getCoordinate(req.query.bottomLeft as string, 1);
+
+    const cats = (await getAllCats()) as Cat[];
+    const _cats: Cat[] = cats.filter((cat: Cat) => {
+      const [lat, lon] = cat.location.coordinates;
+      return (
+        lat <= topRightMax &&
+        lat >= topRightMin &&
+        lon <= bottomLeftMax &&
+        lon >= bottomLeftMin
+      );
+    });
+    res.json(_cats);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const catPut = async (
+  req: Request<{id: string}, {}, Partial<Cat>>,
+  res: Response<DBMessageResponse>,
+  next: NextFunction
+) => {
+  const errors = validationResult(req.body);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    next(new CustomError(messages, 400));
+    return;
+  }
+  const user = res.locals.user as User;
+  const currentCat = await getCat(req.params.id);
+  if (currentCat!.owner._id !== user._id) {
+    next(new CustomError('Not authorized', 401));
+    return;
+  }
+  try {
+    const cat: Partial<Cat> = req.body;
+    const result = await updateCat(req.params.id, cat);
+    console.log('Result: ', result);
+    res.json({
+      message: 'Cat updated',
+      data: {
+        _id: result!._id,
+        cat_name: result!.cat_name,
+        weight: result!.weight,
+        filename: result!.filename,
+        birthdate: result!.birthdate,
+        location: result!.location,
+        owner: result!.owner,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const catPutAdmin = async (
+  req: Request<{id: string}, {}, Partial<Cat>>,
+  res: Response<DBMessageResponse>,
+  next: NextFunction
+) => {
+  const errors = validationResult(req.body);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    next(new CustomError(messages, 400));
+    return;
+  }
+  const user = res.locals.user as User;
+  if (user.role !== 'admin') {
+    next(new CustomError('Not authorized', 401));
+    return;
+  }
+  try {
+    const cat: Partial<Cat> = req.body;
+    const result = await updateCat(req.params.id, cat);
+    res.json({
+      message: 'Cat updated',
+      data: {
+        _id: result!._id,
+        cat_name: result!.cat_name,
+        weight: result!.weight,
+        filename: result!.filename,
+        birthdate: result!.birthdate,
+        location: result!.location,
+        owner: result!.owner,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const catDelete = async (
   req: Request,
   res: Response<DBMessageResponse>,
@@ -161,7 +288,7 @@ const catDelete = async (
   }
   const user = res.locals.user as User;
   const cat = await getCat(req.params.id);
-  if (user.role !== 'admin' || cat!.owner._id !== user._id) {
+  if (cat!.owner._id !== user._id) {
     next(new CustomError('Not authorized', 401));
     return;
   }
@@ -184,4 +311,52 @@ const catDelete = async (
   }
 };
 
-export {catPost, catGet, catDelete, catListGet, catGetByUser};
+const catDeleteAdmin = async (
+  req: Request,
+  res: Response<DBMessageResponse>,
+  next: NextFunction
+) => {
+  const errors = validationResult(req.body);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    next(new CustomError(messages, 400));
+    return;
+  }
+  const user = res.locals.user as User;
+  if (user.role !== 'admin') {
+    next(new CustomError('Not authorized', 401));
+    return;
+  }
+  try {
+    const result = await deleteCat(req.params.id);
+    res.json({
+      message: 'Cat deleted',
+      data: {
+        _id: result!._id,
+        cat_name: result!.cat_name,
+        weight: result!.weight,
+        filename: result!.filename,
+        birthdate: result!.birthdate,
+        location: result!.location,
+        owner: result!.owner,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export {
+  catPost,
+  catGet,
+  catDelete,
+  catListGet,
+  catGetByUser,
+  catGetByBoundingBox,
+  catPut,
+  catPutAdmin,
+  catDeleteAdmin,
+};

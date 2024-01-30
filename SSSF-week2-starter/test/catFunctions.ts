@@ -75,87 +75,87 @@ const postCat = (
       });
   });
 };
-//
-// // admin modify cat
-// const adminPutCat = (
-//   url: string | Function,
-//   token: string,
-//   id: string
-// ): Promise<DBMessageResponse> => {
-//   return new Promise((resolve, reject) => {
-//     const newName = 'Admin Test Cat ' + new Date().toISOString();
-//     request(url)
-//       .put('/api/v1/cats/admin/' + id)
-//       .set('Content-type', 'application/json')
-//       .set('Authorization', 'Bearer ' + token)
-//       .send({
-//         cat_name: newName,
-//       })
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat: DBMessageResponse = response.body;
-//           expect((cat.data as Cat).cat_name).toBe(newName);
-//           expect(cat.message).not.toBe('');
-//           resolve(cat);
-//         }
-//       });
-//   });
-// };
-//
-// // user modify cat
-// const userPutCat = (
-//   url: string | Function,
-//   token: string,
-//   id: string
-// ): Promise<DBMessageResponse> => {
-//   return new Promise((resolve, reject) => {
-//     const newName = 'Test Cat ' + new Date().toISOString();
-//     request(url)
-//       .put('/api/v1/cats/' + id)
-//       .set('Content-type', 'application/json')
-//       .set('Authorization', 'Bearer ' + token)
-//       .send({
-//         cat_name: newName,
-//       })
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat: DBMessageResponse = response.body;
-//           expect(cat.message).not.toBe('');
-//           expect((cat.data as Cat).cat_name).toBe(newName);
-//           resolve(cat);
-//         }
-//       });
-//   });
-// };
-//
-// // admin delete cat
-// const adminDeleteCat = (
-//   url: string | Function,
-//   token: string,
-//   id: string
-// ): Promise<DBMessageResponse> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .delete('/api/v1/cats/admin/' + id)
-//       .set('Content-type', 'application/json')
-//       .set('Authorization', 'Bearer ' + token)
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat: DBMessageResponse = response.body;
-//           expect(cat.message).not.toBe('');
-//           expect(cat.data._id).toBe(id);
-//           resolve(cat);
-//         }
-//       });
-//   });
-// };
-//
+
+// admin modify cat
+const adminPutCat = (
+  url: string | Function,
+  token: string,
+  id: string
+): Promise<DBMessageResponse> => {
+  return new Promise((resolve, reject) => {
+    const newName = 'Admin Test Cat ' + new Date().toISOString();
+    request(url)
+      .put('/api/v1/cats/admin/' + id)
+      .set('Content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        cat_name: newName,
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat: DBMessageResponse = response.body;
+          expect((cat.data as Cat).cat_name).toBe(newName);
+          expect(cat.message).not.toBe('');
+          resolve(cat);
+        }
+      });
+  });
+};
+
+// user modify cat
+const userPutCat = (
+  url: string | Function,
+  token: string,
+  id: string
+): Promise<DBMessageResponse> => {
+  return new Promise((resolve, reject) => {
+    const newName = 'Test Cat ' + new Date().toISOString();
+    request(url)
+      .put('/api/v1/cats/' + id)
+      .set('Content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + token)
+      .send({
+        cat_name: newName,
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat: DBMessageResponse = response.body;
+          expect(cat.message).not.toBe('');
+          expect((cat.data as Cat).cat_name).toBe(newName);
+          resolve(cat);
+        }
+      });
+  });
+};
+
+// admin delete cat
+const adminDeleteCat = (
+  url: string | Function,
+  token: string,
+  id: string
+): Promise<DBMessageResponse> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .delete('/api/v1/cats/admin/' + id)
+      .set('Content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat: DBMessageResponse = response.body;
+          expect(cat.message).not.toBe('');
+          expect(cat.data._id).toBe(id);
+          resolve(cat);
+        }
+      });
+  });
+};
+
 // user delete cat
 const userDeleteCat = (
   url: string | Function,
@@ -201,35 +201,35 @@ const getCatByOwner = (
   });
 };
 
-// const getCatByBoundingBox = (url: string | Function): Promise<Cat[]> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .get('/api/v1/cats/area')
-//       .set('Content-type', 'application/json')
-//       .query({
-//         topRight: '71,38',
-//         bottomLeft: '60,20',
-//       })
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat: Cat[] = response.body;
-//           expect(cat.length).toBeGreaterThan(0);
-//           resolve(cat);
-//         }
-//       });
-//   });
-// };
+const getCatByBoundingBox = (url: string | Function): Promise<Cat[]> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .get('/api/v1/cats/area')
+      .set('Content-type', 'application/json')
+      .query({
+        topRight: '70,20',
+        bottomLeft: '70,20',
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat: Cat[] = response.body;
+          expect(cat.length).toBeGreaterThan(0);
+          resolve(cat);
+        }
+      });
+  });
+};
 
 export {
   getCat,
   getSingleCat,
   postCat,
-  // adminPutCat,
-  // userPutCat,
-  // adminDeleteCat,
+  adminPutCat,
+  userPutCat,
+  adminDeleteCat,
   userDeleteCat,
   getCatByOwner,
-  // getCatByBoundingBox,
+  getCatByBoundingBox,
 };

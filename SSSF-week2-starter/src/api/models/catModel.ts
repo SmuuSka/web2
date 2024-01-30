@@ -88,6 +88,18 @@ const getAllCats = async () => {
   return cats;
 };
 
+const updateCat = async (id: string, cat: Partial<Cat>) => {
+  await mongoConnect();
+  const updatedCat = await catModelVariable
+    .findByIdAndUpdate(id, cat, {
+      new: true,
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  return updatedCat;
+};
+
 const deleteCat = async (id: string) => {
   await mongoConnect();
   const cat = await catModelVariable.findByIdAndDelete(id).catch((error) => {
@@ -96,4 +108,4 @@ const deleteCat = async (id: string) => {
   return cat;
 };
 
-export {addCat, getCat, getAllCats, deleteCat};
+export {addCat, getCat, getAllCats, deleteCat, updateCat};

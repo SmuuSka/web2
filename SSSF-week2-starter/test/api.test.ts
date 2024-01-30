@@ -13,7 +13,17 @@ import {User, UserTest} from '../src/interfaces/User';
 import mongoose from 'mongoose';
 import {getNotFound} from './testFunctions';
 import randomstring from 'randomstring';
-import {postCat, getSingleCat, getCat, getCatByOwner} from './catFunctions';
+import {
+  postCat,
+  getSingleCat,
+  getCat,
+  getCatByOwner,
+  getCatByBoundingBox,
+  userPutCat,
+  adminPutCat,
+  userDeleteCat,
+  adminDeleteCat,
+} from './catFunctions';
 
 interface UserWithToken {
   user: User;
@@ -107,17 +117,16 @@ describe('GET /api/v1', () => {
   it('should return cats by current user', async () => {
     await getCatByOwner(app, token);
   });
+  // get cats by bounding box
+  it('should return cats by bounding box', async () => {
+    await getCatByBoundingBox(app);
+  });
+  //
+  // modify user's cat
+  it('should modify a cat', async () => {
+    await userPutCat(app, token, catID);
+  });
 
-  // // get cats by bounding box
-  // it('should return cats by bounding box', async () => {
-  //   await getCatByBoundingBox(app);
-  // });
-  //
-  // // modify user's cat
-  // it('should modify a cat', async () => {
-  //   await userPutCat(app, token, catID);
-  // });
-  //
   // upload another cat for admin tests
   let catID3: string;
   it('should upload a cat for admin test', async () => {
@@ -135,26 +144,26 @@ describe('GET /api/v1', () => {
     adminToken = user.token;
   });
 
-  // // test modify user's cat as admin
-  // it('should modify a cat as admin', async () => {
-  //   await adminPutCat(app, adminToken, catID3);
-  // });
-  //
-  // // test delete user's cat as admin
-  // it('should delete a cat as admin', async () => {
-  //   await adminDeleteCat(app, adminToken, catID3);
-  // });
-  //
+  // test modify user's cat as admin
+  it('should modify a cat as admin', async () => {
+    await adminPutCat(app, adminToken, catID3);
+  });
+
+  // test delete user's cat as admin
+  it('should delete a cat as admin', async () => {
+    await adminDeleteCat(app, adminToken, catID3);
+  });
+
   // test delete user's cat
-  // it('should delete a cat', async () => {
-  //   await userDeleteCat(app, token, catID);
-  // });
-  //
-  // // delete GPS image
-  // it('should delete GPS image', async () => {
-  //   await userDeleteCat(app, token, catID2);
-  // });
-  //
+  it('should delete a cat', async () => {
+    await userDeleteCat(app, token, catID);
+  });
+
+  // delete GPS image
+  it('should delete GPS image', async () => {
+    await userDeleteCat(app, token, catID2);
+  });
+
   //test delete user based on token
   it('should delete current user', async () => {
     await deleteUser(app, token);

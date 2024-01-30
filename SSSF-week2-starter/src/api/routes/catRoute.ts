@@ -5,6 +5,10 @@ import {
   catDelete,
   catListGet,
   catGetByUser,
+  catGetByBoundingBox,
+  catPut,
+  catPutAdmin,
+  catDeleteAdmin,
 } from '../controllers/catController';
 import multer, {FileFilterCallback} from 'multer';
 import {authenticate, getCoordinates, makeThumbnail} from '../../middlewares';
@@ -40,19 +44,19 @@ router
     catPost
   );
 
-// router.route('/area').get(catGetByBoundingBox);
-//
+router.route('/area').get(catGetByBoundingBox);
+
 router.route('/user').get(authenticate, catGetByUser);
 
-// router
-//   .route('/admin/:id')
-//   .put(passport.authenticate('jwt', {session: false}), catPutAdmin)
-//   .delete(passport.authenticate('jwt', {session: false}), catDeleteAdmin);
-//
+router
+  .route('/admin/:id')
+  .put(authenticate, catPutAdmin)
+  .delete(authenticate, catDeleteAdmin);
+
 router
   .route('/:id')
   .get(param('id'), catGet)
-  //.put(authenticate, param('id'), catPut)
+  .put(authenticate, param('id'), catPut)
   .delete(authenticate, param('id'), catDelete);
 
 export default router;
