@@ -2,7 +2,6 @@
 import mongoConnect from '../../utils/db';
 import mongoose from 'mongoose';
 import {User} from '../../interfaces/User';
-import ErrorResponse from '../../interfaces/ErrorResponse';
 
 const userSchema = new mongoose.Schema({
   user_name: {
@@ -67,7 +66,7 @@ const updateUser = async (data: Partial<User>, id: number) => {
   return user;
 };
 
-const deleteUser = async (id: number) => {
+const deleteUser = async (id: string) => {
   await mongoConnect();
   return userModelVariable.findByIdAndDelete(id);
 };

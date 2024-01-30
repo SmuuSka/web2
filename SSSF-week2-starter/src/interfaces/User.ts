@@ -1,6 +1,6 @@
 // TODO: user interface
 interface User {
-  _id: number;
+  _id: string;
   user_name: string;
   email: string;
   role: 'admin' | 'user';
@@ -8,12 +8,12 @@ interface User {
 }
 
 interface UserOutput {
-  _id: number;
+  _id: string;
   user_name: string;
   email: string;
 }
 interface LoginUser {
-  _id: number;
+  _id: string;
   user_name: string;
   email: string;
   role: 'admin' | 'user';

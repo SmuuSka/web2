@@ -179,7 +179,7 @@ const userDelete = async (
 
   try {
     const user = req.user as User;
-    const result = await deleteUser((req.user as User)._id);
+    const result = await deleteUser(user._id);
     console.log('userDelete', result);
   } catch (error) {
     next(error);

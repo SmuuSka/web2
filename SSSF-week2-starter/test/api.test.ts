@@ -19,13 +19,13 @@ import {getNotFound} from './testFunctions';
 //   getCatByBoundingBox,
 //   getCatByOwner,
 //   getSingleCat,
-//   postCat,
+//postCat,
 //   userDeleteCat,
 //   userPutCat,
 // } from './catFunctions';
 
 import randomstring from 'randomstring';
-//import {catGetByUser} from '../src/api/controllers/catController';
+import {postCat} from './catFunctions';
 
 interface UserWithToken {
   user: User;
@@ -92,14 +92,13 @@ describe('GET /api/v1', () => {
   it('should return current user', async () => {
     await getCurrentUser(app, token);
   });
+  // test cat upload without GPS
+  let catID: string;
+  it('should upload a cat', async () => {
+    const message = await postCat(app, token, 'cat.jpg');
+    catID = message.data._id;
+  });
 
-  // // test cat upload without GPS
-  // let catID: string;
-  // it('should upload a cat', async () => {
-  //   const message = await postCat(app, token, 'cat.jpg');
-  //   catID = message.data._id;
-  // });
-  //
   // // test cat upload with GPS
   // let catID2: string;
   // it('should upload a cat with GPS', async () => {
