@@ -12,20 +12,8 @@ import {
 import {User, UserTest} from '../src/interfaces/User';
 import mongoose from 'mongoose';
 import {getNotFound} from './testFunctions';
-// import {
-//   adminDeleteCat,
-//   adminPutCat,
-//   getCat,
-//   getCatByBoundingBox,
-//   getCatByOwner,
-//   getSingleCat,
-//postCat,
-//   userDeleteCat,
-//   userPutCat,
-// } from './catFunctions';
-
 import randomstring from 'randomstring';
-import {postCat} from './catFunctions';
+import {postCat, getSingleCat, getCat, getCatByOwner} from './catFunctions';
 
 interface UserWithToken {
   user: User;
@@ -40,7 +28,6 @@ describe('GET /api/v1', () => {
   afterAll(async () => {
     await mongoose.connection.close();
   });
-
   // test not found
   it('responds with a not found message', async () => {
     await getNotFound(app);
@@ -99,28 +86,28 @@ describe('GET /api/v1', () => {
     catID = message.data._id;
   });
 
-  // // test cat upload with GPS
-  // let catID2: string;
-  // it('should upload a cat with GPS', async () => {
-  //   const message = await postCat(app, token, 'picWithGPS.jpg');
-  //   catID2 = message.data._id;
-  // });
-  //
-  // // test get all cats
-  // it('should return array of cats', async () => {
-  //   await getCat(app);
-  // });
-  //
-  // // test get single cat
-  // it('should return single cat', async () => {
-  //   await getSingleCat(app, catID);
-  // });
-  //
-  // // get cats by current user
-  // it('should return cats by current user', async () => {
-  //   await getCatByOwner(app, token);
-  // });
-  //
+  // test cat upload with GPS
+  let catID2: string;
+  it('should upload a cat with GPS', async () => {
+    const message = await postCat(app, token, 'picWithGPS.jpg');
+    catID2 = message.data._id;
+  });
+
+  // test get all cats
+  it('should return array of cats', async () => {
+    await getCat(app);
+  });
+
+  // test get single cat
+  it('should return single cat', async () => {
+    await getSingleCat(app, catID);
+  });
+
+  // get cats by current user
+  it('should return cats by current user', async () => {
+    await getCatByOwner(app, token);
+  });
+
   // // get cats by bounding box
   // it('should return cats by bounding box', async () => {
   //   await getCatByBoundingBox(app);
@@ -131,12 +118,12 @@ describe('GET /api/v1', () => {
   //   await userPutCat(app, token, catID);
   // });
   //
-  // // upload another cat for admin tests
-  // let catID3: string;
-  // it('should upload a cat for admin test', async () => {
-  //   const message = await postCat(app, token, 'cat.jpg');
-  //   catID3 = message.data._id;
-  // });
+  // upload another cat for admin tests
+  let catID3: string;
+  it('should upload a cat for admin test', async () => {
+    const message = await postCat(app, token, 'cat.jpg');
+    catID3 = message.data._id;
+  });
 
   //login as admin
   let adminToken: string;
@@ -158,7 +145,7 @@ describe('GET /api/v1', () => {
   //   await adminDeleteCat(app, adminToken, catID3);
   // });
   //
-  // // test delete user's cat
+  // test delete user's cat
   // it('should delete a cat', async () => {
   //   await userDeleteCat(app, token, catID);
   // });

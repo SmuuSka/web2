@@ -8,7 +8,7 @@ interface Cat {
   weight: number;
   filename: string;
   birthdate: string;
-  coords: {
+  location: {
     type: string;
     coordinates: [number, number];
   };
@@ -24,7 +24,7 @@ interface CatOutput {
   weight: number;
   filename: string;
   birthdate: string;
-  coords: {
+  location: {
     type: string;
     coordinates: [number, number];
   };

@@ -22,7 +22,7 @@ const catSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  coords: {
+  location: {
     type: {
       type: String,
       enum: ['Point'],
@@ -61,7 +61,7 @@ const addCat = async (cat: Omit<Cat, '_id'>) => {
       weight: cat.weight,
       filename: cat.filename,
       birthdate: cat.birthdate,
-      coords: cat.coords,
+      location: cat.location,
       owner: cat.owner,
     },
     {versionKey: false}
@@ -72,4 +72,28 @@ const addCat = async (cat: Omit<Cat, '_id'>) => {
   return newCat;
 };
 
-export {addCat};
+const getCat = async (id: string) => {
+  await mongoConnect();
+  const cat = await catModelVariable.findById(id).catch((error) => {
+    console.log(error);
+  });
+  return cat;
+};
+
+const getAllCats = async () => {
+  await mongoConnect();
+  const cats = await catModelVariable.find().catch((error) => {
+    console.log(error);
+  });
+  return cats;
+};
+
+const deleteCat = async (id: string) => {
+  await mongoConnect();
+  const cat = await catModelVariable.findByIdAndDelete(id).catch((error) => {
+    console.log(error);
+  });
+  return cat;
+};
+
+export {addCat, getCat, getAllCats, deleteCat};

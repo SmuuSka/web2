@@ -5,49 +5,49 @@ import {Cat} from '../src/interfaces/Cat';
 import DBMessageResponse from '../src/interfaces/DBMessageResponse';
 import {Types} from 'mongoose';
 
-// const getCat = (url: string | Function): Promise<Cat[]> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .get('/api/v1/cats')
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cats: Cat[] = response.body;
-//           cats.forEach((cat) => {
-//             expect(cat).toHaveProperty('_id');
-//             expect(cat).toHaveProperty('cat_name');
-//             expect(cat.owner._id).not.toBeUndefined();
-//             expect(cat).toHaveProperty('weight');
-//             expect(cat).toHaveProperty('birthdate');
-//             expect(cat.location).toHaveProperty('type');
-//           });
-//           resolve(cats);
-//         }
-//       });
-//   });
-// };
-//
-// const getSingleCat = (url: string | Function, id: string): Promise<Cat> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .get('/api/v1/cats/' + id)
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat = response.body;
-//           expect(cat).toHaveProperty('_id');
-//           expect(cat).toHaveProperty('cat_name');
-//           expect(cat.owner._id).not.toBeUndefined();
-//           expect(cat).toHaveProperty('weight');
-//           expect(cat).toHaveProperty('birthdate');
-//           expect(cat.location).toHaveProperty('type');
-//           resolve(response.body);
-//         }
-//       });
-//   });
-// };
+const getCat = (url: string | Function): Promise<Cat[]> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .get('/api/v1/cats')
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cats: Cat[] = response.body;
+          cats.forEach((cat) => {
+            expect(cat).toHaveProperty('_id');
+            expect(cat).toHaveProperty('cat_name');
+            expect(cat.owner._id).not.toBeUndefined();
+            expect(cat).toHaveProperty('weight');
+            expect(cat).toHaveProperty('birthdate');
+            expect(cat.location).toHaveProperty('type');
+          });
+          resolve(cats);
+        }
+      });
+  });
+};
+
+const getSingleCat = (url: string | Function, id: string): Promise<Cat> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .get('/api/v1/cats/' + id)
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat = response.body;
+          expect(cat).toHaveProperty('_id');
+          expect(cat).toHaveProperty('cat_name');
+          expect(cat.owner._id).not.toBeUndefined();
+          expect(cat).toHaveProperty('weight');
+          expect(cat).toHaveProperty('birthdate');
+          expect(cat.location).toHaveProperty('type');
+          resolve(response.body);
+        }
+      });
+  });
+};
 
 const postCat = (
   url: string | Function,
@@ -156,51 +156,51 @@ const postCat = (
 //   });
 // };
 //
-// // user delete cat
-// const userDeleteCat = (
-//   url: string | Function,
-//   token: string,
-//   id: string
-// ): Promise<DBMessageResponse> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .delete('/api/v1/cats/' + id)
-//       .set('Content-type', 'application/json')
-//       .set('Authorization', 'Bearer ' + token)
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cat: DBMessageResponse = response.body;
-//           expect(cat.message).not.toBe('');
-//           expect(cat.data._id).toBe(id);
-//           resolve(cat);
-//         }
-//       });
-//   });
-// };
-//
-// const getCatByOwner = (
-//   url: string | Function,
-//   token: string
-// ): Promise<Cat[]> => {
-//   return new Promise((resolve, reject) => {
-//     request(url)
-//       .get('/api/v1/cats/user')
-//       .set('Content-type', 'application/json')
-//       .set('Authorization', 'Bearer ' + token)
-//       .expect(200, (err, response) => {
-//         if (err) {
-//           reject(err);
-//         } else {
-//           const cats: Cat[] = response.body;
-//           expect(cats.length).toBeGreaterThan(0);
-//           resolve(cats);
-//         }
-//       });
-//   });
-// };
-//
+// user delete cat
+const userDeleteCat = (
+  url: string | Function,
+  token: string,
+  id: string
+): Promise<DBMessageResponse> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .delete('/api/v1/cats/' + id)
+      .set('Content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cat: DBMessageResponse = response.body;
+          expect(cat.message).not.toBe('');
+          expect(cat.data._id).toBe(id);
+          resolve(cat);
+        }
+      });
+  });
+};
+
+const getCatByOwner = (
+  url: string | Function,
+  token: string
+): Promise<Cat[]> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .get('/api/v1/cats/user')
+      .set('Content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + token)
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const cats: Cat[] = response.body;
+          expect(cats.length).toBeGreaterThan(0);
+          resolve(cats);
+        }
+      });
+  });
+};
+
 // const getCatByBoundingBox = (url: string | Function): Promise<Cat[]> => {
 //   return new Promise((resolve, reject) => {
 //     request(url)
@@ -223,13 +223,13 @@ const postCat = (
 // };
 
 export {
-  //getCat,
-  //getSingleCat,
+  getCat,
+  getSingleCat,
   postCat,
   // adminPutCat,
   // userPutCat,
   // adminDeleteCat,
-  // userDeleteCat,
-  // getCatByOwner,
+  userDeleteCat,
+  getCatByOwner,
   // getCatByBoundingBox,
 };
