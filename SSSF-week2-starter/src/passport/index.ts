@@ -2,13 +2,13 @@ import passport from 'passport';
 import {Strategy} from 'passport-local';
 import {Strategy as JWTStrategy, ExtractJwt} from 'passport-jwt';
 import bcrypt from 'bcryptjs';
-import userModel from '../api/models/userModel';
+import {userModelVariable} from '../api/models/userModel';
 import {LoginUser} from '../interfaces/User';
 
 passport.use(
   new Strategy(async (username, password, done) => {
     try {
-      const user = await userModel.findOne({email: username});
+      const user = await userModelVariable.findOne({email: username});
       if (user === null || !user) {
         return done(null, false);
       }

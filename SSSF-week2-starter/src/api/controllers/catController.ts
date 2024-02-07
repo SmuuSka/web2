@@ -22,8 +22,6 @@ import {
   getAllCats,
   updateCat,
 } from '../models/catModel';
-import MessageResponse from '../../interfaces/MessageResponse';
-import {getUser} from '../models/userModel';
 
 const catPost = async (
   req: Request<{}, {}, Cat>,
