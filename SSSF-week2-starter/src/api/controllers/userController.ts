@@ -5,8 +5,7 @@
 // - userPutCurrent - update current user
 // - userDeleteCurrent - delete current user
 // - checkToken - check if current user token is valid: return data from req.user. No need for database query
-import {userModelVariable} from '../models/userModel';
-
+import {userModel} from '../models/userModel';
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
@@ -22,7 +21,7 @@ const userListGet = async (
   next: NextFunction
 ) => {
   try {
-    const users = await userModelVariable.find({});
+    const users = await userModel.find({});
     const _users: User[] = [];
     for (const user of users) {
       const _user = {
@@ -44,8 +43,7 @@ const userGet = async (
   next: NextFunction
 ) => {
   try {
-    //const user = await getUser(req.params.id);
-    const user = await userModelVariable.findById(req.params.id);
+    const user = await userModel.findById(req.params.id);
     const _user = {
       _id: user!._id,
       user_name: user!.user_name,
@@ -77,7 +75,7 @@ const userPost = async (
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, salt),
     };
-    const result = await userModelVariable.create(user);
+    const result = await userModel.create(user);
     res.status(200).json({
       message: 'User added',
       data: {
@@ -91,73 +89,6 @@ const userPost = async (
     next(error);
   }
 };
-
-// const userPost = async (
-//   req: Request<{}, {}, User>,
-//   res: Response<DBMessageResponse>,
-//   next: NextFunction
-// ) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     const messages: string = errors
-//       .array()
-//       .map((error) => `${error.msg}: ${error.param}`)
-//       .join(', ');
-//     console.log('user_post validation', messages);
-//     next(new CustomError(messages, 400));
-//     return;
-//   }
-//
-//   try {
-//     const user = req.body as User;
-//     user.password = bcrypt.hashSync(req.body.password, salt);
-//     const result = await addUser(user);
-//     res.status(200).json({
-//       message: 'User added',
-//       data: {
-//         _id: result._id,
-//         user_name: result.user_name,
-//         email: result.email,
-//       },
-//     });
-//   } catch (error) {
-//     res.status(400);
-//     next(error);
-//   }
-// };
-
-// const userPut = async (
-//   req: Request<{id: User}>,
-//   res: Response<MessageResponse>,
-//   next: NextFunction
-// ) => {
-//   const errors = validationResult(req.body);
-//   if (!errors.isEmpty()) {
-//     const messages: string = errors
-//       .array()
-//       .map((error) => `${error.msg}: ${error.param}`)
-//       .join(', ');
-//     console.log('cat_post validation', messages);
-//     next(new CustomError(messages, 400));
-//     return;
-//   }
-//
-//   try {
-//     const user = req.body;
-//     if (user && user.role !== 'admin') {
-//       throw new CustomError('Admin only', 403);
-//     }
-//     // const result = await updateUser(user, Number(req.params.id));
-//     const result = await userModelVariable.findByIdAndUpdate(
-//       req.params.id,
-//       user,
-//       {new: true}
-//     );
-//     console.log('userPut', result);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 // TODO: create userPutCurrent function to update current user
 // userPutCurrent should use updateUser function from userModel
@@ -179,8 +110,7 @@ const userPutCurrent = async (
   const user = req.body as User;
   console.log('userPutCurrent', user);
   try {
-    //const result = await updateUser(user, res.locals.user._id);
-    const result = await userModelVariable.findByIdAndUpdate(
+    const result = await userModel.findByIdAndUpdate(
       res.locals.user._id,
       user,
       {new: true}
@@ -219,7 +149,7 @@ const userDelete = async (
   }
 
   try {
-    const result = await userModelVariable.findByIdAndDelete(req.params.id);
+    const result = await userModel.findByIdAndDelete(req.params.id);
     console.log('userDelete', result);
   } catch (error) {
     next(error);
@@ -242,10 +172,7 @@ const userDeleteCurrent = async (
     return;
   }
   try {
-    // const result = await deleteUser(res.locals.user._id);
-    const result = await userModelVariable.findByIdAndDelete(
-      res.locals.user._id
-    );
+    const result = await userModel.findByIdAndDelete(res.locals.user._id);
     res.json({
       message: 'User deleted',
       data: {

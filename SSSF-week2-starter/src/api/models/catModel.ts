@@ -1,7 +1,6 @@
 // TODO: mongoose schema for cat
 import mongoose from 'mongoose';
 import {Cat} from '../../interfaces/Cat';
-import mongoConnect from '../../utils/db';
 
 const catSchema = new mongoose.Schema({
   cat_name: {
@@ -51,61 +50,4 @@ const catSchema = new mongoose.Schema({
 
 catSchema.index({location: '2dsphere'});
 
-const catModelVariable = mongoose.model<Cat>('Cat', catSchema);
-
-const addCat = async (cat: Omit<Cat, '_id'>) => {
-  await mongoConnect();
-  const newCat = new catModelVariable(
-    {
-      cat_name: cat.cat_name,
-      weight: cat.weight,
-      filename: cat.filename,
-      birthdate: cat.birthdate,
-      location: cat.location,
-      owner: cat.owner,
-    },
-    {versionKey: false}
-  );
-  await newCat.save().catch((error) => {
-    console.log(error);
-  });
-  return newCat;
-};
-
-const getCat = async (id: string) => {
-  await mongoConnect();
-  const cat = await catModelVariable.findById(id).catch((error) => {
-    console.log(error);
-  });
-  return cat;
-};
-
-const getAllCats = async () => {
-  await mongoConnect();
-  const cats = await catModelVariable.find().catch((error) => {
-    console.log(error);
-  });
-  return cats;
-};
-
-const updateCat = async (id: string, cat: Partial<Cat>) => {
-  await mongoConnect();
-  const updatedCat = await catModelVariable
-    .findByIdAndUpdate(id, cat, {
-      new: true,
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return updatedCat;
-};
-
-const deleteCat = async (id: string) => {
-  await mongoConnect();
-  const cat = await catModelVariable.findByIdAndDelete(id).catch((error) => {
-    console.log(error);
-  });
-  return cat;
-};
-
-export {addCat, getCat, getAllCats, deleteCat, updateCat};
+export const catModelVariable = mongoose.model<Cat>('Cat', catSchema);

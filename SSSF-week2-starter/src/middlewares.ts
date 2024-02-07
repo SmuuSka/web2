@@ -5,7 +5,7 @@ import {ExifImage} from 'exif';
 import ErrorResponse from './interfaces/ErrorResponse';
 import CustomError from './classes/CustomError';
 import jwt from 'jsonwebtoken';
-import {User, UserOutput} from './interfaces/User';
+import {UserOutput} from './interfaces/User';
 
 // convert GPS coordinates to decimal format
 // for longitude, send exifData.gps.GPSLongitude, exifData.gps.GPSLongitudeRef
