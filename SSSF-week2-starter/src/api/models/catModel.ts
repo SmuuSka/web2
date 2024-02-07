@@ -50,4 +50,4 @@ const catSchema = new mongoose.Schema({
 
 catSchema.index({location: '2dsphere'});
 
-export const catModelVariable = mongoose.model<Cat>('Cat', catSchema);
+export const catModel = mongoose.model<Cat>('Cat', catSchema);

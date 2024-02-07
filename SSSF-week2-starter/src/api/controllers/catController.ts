@@ -15,15 +15,7 @@ import {User} from '../../interfaces/User';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import {validationResult} from 'express-validator';
 import CustomError from '../../classes/CustomError';
-import {
-  addCat,
-  getCat,
-  deleteCat,
-  getAllCats,
-  updateCat,
-} from '../models/catModel';
-import MessageResponse from '../../interfaces/MessageResponse';
-import {getUser} from '../models/userModel';
+import {catModel} from '../models/catModel';
 
 const catPost = async (
   req: Request<{}, {}, Cat>,
@@ -54,7 +46,7 @@ const catPost = async (
   };
 
   try {
-    const result = await catModelVariable.create(cat);
+    const result = await catModel.create(cat);
     res.json({
       message: 'Cat added',
       data: {
@@ -78,7 +70,7 @@ const catGet = async (
   next: NextFunction
 ) => {
   try {
-    const cat = await catModelVariable.findById(req.params.id);
+    const cat = await catModel.findById(req.params.id);
     const _cat = {
       _id: cat!._id,
       cat_name: cat!,
@@ -107,7 +99,7 @@ const catListGet = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     // const cats = (await getAllCats()) as Cat[];
-    const cats = await catModelVariable.find({});
+    const cats = await catModel.find({});
     const _cats: Cat[] = cats.map((cat: Cat) => {
       const _cat: CatOutput = {
         _id: cat._id,
@@ -142,7 +134,7 @@ const catGetByUser = async (
   }
   try {
     const user = res.locals.user as User;
-    const cats = await catModelVariable.find({});
+    const cats = await catModel.find({});
     const _cats: Cat[] = cats.filter((cat: Cat) => {
       return cat.owner._id === user._id;
     });
@@ -174,7 +166,7 @@ const catGetByBoundingBox = async (
     const topRightMin = getCoordinate(req.query.topRight as string, 1);
     const bottomLeftMax = getCoordinate(req.query.bottomLeft as string, 0);
     const bottomLeftMin = getCoordinate(req.query.bottomLeft as string, 1);
-    const cats = await catModelVariable.find({});
+    const cats = await catModel.find({});
     const _cats: Cat[] = cats.filter((cat: Cat) => {
       const [lat, lon] = cat.location.coordinates;
       return (
@@ -205,14 +197,14 @@ const catPut = async (
     return;
   }
   const user = res.locals.user as User;
-  const currentCat = await catModelVariable.findById(req.params.id);
+  const currentCat = await catModel.findById(req.params.id);
   if (currentCat!.owner._id !== user._id) {
     next(new CustomError('Not authorized', 401));
     return;
   }
   try {
     const cat: Partial<Cat> = req.body;
-    const result = await catModelVariable.findByIdAndUpdate(
+    const result = await catModel.findByIdAndUpdate(
       req.params.id,
       cat,
       {new: true}
@@ -255,7 +247,7 @@ const catPutAdmin = async (
   }
   try {
     const cat: Partial<Cat> = req.body;
-    const result = await catModelVariable.findByIdAndUpdate(
+    const result = await catModel.findByIdAndUpdate(
       req.params.id,
       cat,
       {new: true}
@@ -293,13 +285,13 @@ const catDelete = async (
   }
   const user = res.locals.user as User;
   // const cat = await getCat(req.params.id);
-  const cat = await catModelVariable.findById(req.params.id);
+  const cat = await catModel.findById(req.params.id);
   if (cat!.owner._id !== user._id) {
     next(new CustomError('Not authorized', 401));
     return;
   }
   try {
-    const result = await catModelVariable.findByIdAndDelete(req.params.id);
+    const result = await catModel.findByIdAndDelete(req.params.id);
     res.json({
       message: 'Cat deleted',
       data: {
@@ -337,7 +329,7 @@ const catDeleteAdmin = async (
     return;
   }
   try {
-    const result = await catModelVariable.findByIdAndDelete(req.params.id);
+    const result = await catModel.findByIdAndDelete(req.params.id);
     res.json({
       message: 'Cat deleted',
       data: {
