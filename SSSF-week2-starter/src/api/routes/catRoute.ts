@@ -1,14 +1,14 @@
 import express, {Request} from 'express';
 import {
-  catPost,
   catGet,
-  catDelete,
   catListGet,
   catGetByUser,
-  catGetByBoundingBox,
-  catPut,
-  catPutAdmin,
+  catDelete,
   catDeleteAdmin,
+  catPutAdmin,
+  catPut,
+  catGetByBoundingBox,
+  catPost,
 } from '../controllers/catController';
 import multer, {FileFilterCallback} from 'multer';
 import {authenticate, getCoordinates, makeThumbnail} from '../../middlewares';
@@ -28,8 +28,8 @@ const fileFilter = (
 const upload = multer({dest: './uploads/', fileFilter});
 const router = express.Router();
 
-// TODO: add validation
-
+// // TODO: add validation
+//
 router
   .route('/')
   .get(catListGet)

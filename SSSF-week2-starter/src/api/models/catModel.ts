@@ -1,6 +1,6 @@
 // TODO: mongoose schema for cat
 import mongoose from 'mongoose';
-import {Cat} from '../../interfaces/Cat';
+import {Cat} from '../../types/DBTypes';
 
 const catSchema = new mongoose.Schema({
   cat_name: {
@@ -18,7 +18,7 @@ const catSchema = new mongoose.Schema({
     required: true,
   },
   birthdate: {
-    type: String,
+    type: Date,
     required: true,
   },
   location: {
@@ -33,21 +33,10 @@ const catSchema = new mongoose.Schema({
     },
   },
   owner: {
-    _id: {
-      type: String,
-      required: true,
-    },
-    user_name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   },
 });
-
-catSchema.index({location: '2dsphere'});
 
 export const catModel = mongoose.model<Cat>('Cat', catSchema);

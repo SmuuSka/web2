@@ -9,17 +9,14 @@
 // - catListGet - get all cats
 // - catPost - create new cat
 
-import {Cat, CatOutput} from '../../interfaces/Cat';
+import {User, Cat} from '../../types/DBTypes';
 import {NextFunction, Request, Response} from 'express';
-import {User} from '../../interfaces/User';
-import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import {validationResult} from 'express-validator';
 import CustomError from '../../classes/CustomError';
 import {catModel} from '../models/catModel';
-
 const catPost = async (
   req: Request<{}, {}, Cat>,
-  res: Response<DBMessageResponse>,
+  res: Response,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -38,13 +35,8 @@ const catPost = async (
     filename: req.file?.filename as string,
     birthdate: req.body.birthdate,
     location: res.locals.coords,
-    owner: {
-      _id: user._id!,
-      user_name: user.user_name!,
-      email: user.email!,
-    },
+    owner: user,
   };
-
   try {
     const result = await catModel.create(cat);
     res.json({
@@ -71,22 +63,27 @@ const catGet = async (
 ) => {
   try {
     const cat = await catModel.findById(req.params.id);
-    const _cat = {
+    res.json({
       _id: cat!._id,
-      cat_name: cat!,
+      cat_name: cat!.cat_name,
       weight: cat!.weight,
       filename: cat!.filename,
       birthdate: cat!.birthdate,
       location: cat!.location,
-      owner: cat!.owner,
-    };
-    res.json(_cat);
+      owner: {
+        _id: cat!.owner._id,
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
 
-const catListGet = async (req: Request, res: Response, next: NextFunction) => {
+const catListGet = async (
+  req: Request,
+  res: Response<Cat[]>,
+  next: NextFunction
+) => {
   const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -96,25 +93,24 @@ const catListGet = async (req: Request, res: Response, next: NextFunction) => {
     next(new CustomError(messages, 400));
     return;
   }
-
   try {
-    // const cats = (await getAllCats()) as Cat[];
     const cats = await catModel.find({});
     const _cats: Cat[] = cats.map((cat: Cat) => {
-      const _cat: CatOutput = {
+      return {
         _id: cat._id,
         cat_name: cat.cat_name,
         weight: cat.weight,
         filename: cat.filename,
         birthdate: cat.birthdate,
         location: cat.location,
-        owner: cat.owner,
+        owner: {
+          _id: cat.owner._id,
+        },
       };
-      return _cat;
     });
     res.json(_cats);
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(new CustomError('Error', 500));
   }
 };
 
@@ -134,11 +130,8 @@ const catGetByUser = async (
   }
   try {
     const user = res.locals.user as User;
-    const cats = await catModel.find({});
-    const _cats: Cat[] = cats.filter((cat: Cat) => {
-      return cat.owner._id === user._id;
-    });
-    res.json(_cats);
+    const cats = await catModel.find({owner: user._id});
+    res.json(cats);
   } catch (error) {
     next(error);
   }
@@ -146,7 +139,7 @@ const catGetByUser = async (
 
 const catGetByBoundingBox = async (
   req: Request,
-  res: Response<Cat[]>,
+  res: Response,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -184,7 +177,7 @@ const catGetByBoundingBox = async (
 
 const catPut = async (
   req: Request<{id: string}, {}, Partial<Cat>>,
-  res: Response<DBMessageResponse>,
+  res: Response,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -197,18 +190,27 @@ const catPut = async (
     return;
   }
   const user = res.locals.user as User;
-  const currentCat = await catModel.findById(req.params.id);
-  if (currentCat!.owner._id !== user._id) {
+  const cat = await catModel.findById(req.params.id);
+  const _cat = {
+    _id: cat!._id,
+    cat_name: cat!.cat_name,
+    weight: cat!.weight,
+    filename: cat!.filename,
+    birthdate: cat!.birthdate,
+    location: cat!.location,
+    owner: {
+      _id: cat!.owner._id.toString(),
+    },
+  };
+  if (user._id !== _cat.owner._id) {
     next(new CustomError('Not authorized', 401));
     return;
   }
   try {
     const cat: Partial<Cat> = req.body;
-    const result = await catModel.findByIdAndUpdate(
-      req.params.id,
-      cat,
-      {new: true}
-    );
+    const result = await catModel.findByIdAndUpdate(_cat._id, cat, {
+      new: true,
+    });
     res.json({
       message: 'Cat updated',
       data: {
@@ -228,7 +230,7 @@ const catPut = async (
 
 const catPutAdmin = async (
   req: Request<{id: string}, {}, Partial<Cat>>,
-  res: Response<DBMessageResponse>,
+  res: Response,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -247,11 +249,9 @@ const catPutAdmin = async (
   }
   try {
     const cat: Partial<Cat> = req.body;
-    const result = await catModel.findByIdAndUpdate(
-      req.params.id,
-      cat,
-      {new: true}
-    );
+    const result = await catModel.findByIdAndUpdate(req.params.id, cat, {
+      new: true,
+    });
     res.json({
       message: 'Cat updated',
       data: {
@@ -269,11 +269,7 @@ const catPutAdmin = async (
   }
 };
 
-const catDelete = async (
-  req: Request,
-  res: Response<DBMessageResponse>,
-  next: NextFunction
-) => {
+const catDelete = async (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -284,9 +280,19 @@ const catDelete = async (
     return;
   }
   const user = res.locals.user as User;
-  // const cat = await getCat(req.params.id);
   const cat = await catModel.findById(req.params.id);
-  if (cat!.owner._id !== user._id) {
+  const _cat = {
+    _id: cat!._id,
+    cat_name: cat!.cat_name,
+    weight: cat!.weight,
+    filename: cat!.filename,
+    birthdate: cat!.birthdate,
+    location: cat!.location,
+    owner: {
+      _id: cat!.owner._id.toString(),
+    },
+  };
+  if (user._id !== _cat.owner._id) {
     next(new CustomError('Not authorized', 401));
     return;
   }
@@ -311,7 +317,7 @@ const catDelete = async (
 
 const catDeleteAdmin = async (
   req: Request,
-  res: Response<DBMessageResponse>,
+  res: Response,
   next: NextFunction
 ) => {
   const errors = validationResult(req.body);
@@ -350,11 +356,11 @@ const catDeleteAdmin = async (
 export {
   catPost,
   catGet,
-  catDelete,
   catListGet,
   catGetByUser,
   catGetByBoundingBox,
   catPut,
   catPutAdmin,
+  catDelete,
   catDeleteAdmin,
 };

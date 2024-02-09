@@ -9,7 +9,8 @@ import {userModel} from '../models/userModel';
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
-import {User, UserOutput} from '../../interfaces/User';
+//import {User, UserOutput} from '../../interfaces/User';
+import {User, UserOutput} from '../../types/DBTypes';
 import MessageResponse from '../../interfaces/MessageResponse';
 import {validationResult} from 'express-validator';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
@@ -21,6 +22,16 @@ const userListGet = async (
   next: NextFunction
 ) => {
   try {
+    const errors = validationResult(_req);
+    if (!errors.isEmpty()) {
+      const messages: string = errors
+        .array()
+        .map((error) => `${error.msg}: ${error.param}`)
+        .join(', ');
+      console.log('userListGet validation', messages);
+      next(new CustomError(messages, 400));
+      return;
+    }
     const users = await userModel.find({});
     const _users: User[] = [];
     for (const user of users) {
@@ -38,10 +49,20 @@ const userListGet = async (
 };
 
 const userGet = async (
-  req: Request<{id: number}>,
+  req: Request<{id: User}>,
   res: Response,
   next: NextFunction
 ) => {
+  const errors = validationResult(req.params.id);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('userGet validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
   try {
     const user = await userModel.findById(req.params.id);
     const _user = {
