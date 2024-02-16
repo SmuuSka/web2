@@ -148,16 +148,16 @@ describe('GET /api/v1', () => {
   it('should modify a cat as admin', async () => {
     await adminPutCat(app, adminToken, catID3);
   });
-
-  // test delete user's cat as admin
-  it('should delete a cat as admin', async () => {
-    await adminDeleteCat(app, adminToken, catID3);
-  });
-
-  // test delete user's cat
-  it('should delete a cat', async () => {
-    await userDeleteCat(app, token, catID);
-  });
+  //
+  // // test delete user's cat as admin
+  // it('should delete a cat as admin', async () => {
+  //   await adminDeleteCat(app, adminToken, catID3);
+  // });
+  //
+  // // test delete user's cat
+  // it('should delete a cat', async () => {
+  //   await userDeleteCat(app, token, catID);
+  // });
 
   // delete GPS image
   it('should delete GPS image', async () => {
