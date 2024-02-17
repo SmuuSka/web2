@@ -1,6 +1,8 @@
 //import {GraphQLError} from 'graphql';
-import {UserInput} from '../../types/DBTypes';
+import {User, UserInput} from '../../types/DBTypes';
 import {userModel} from '../models/userModel';
+//import {UserResponse} from '../../types/MessageTypes';
+import fetchData from '../../functions/fetchData';
 import {UserResponse} from '../../types/MessageTypes';
 //import fetchData from '../../functions/fetchData';
 //import {LoginResponse, UserResponse} from '../../types/MessageTypes';
@@ -11,21 +13,36 @@ import {UserResponse} from '../../types/MessageTypes';
 export default {
   Query: {
     users: async () => {
-      return userModel.find({});
+      return await fetchData<User[]>(`${process.env.AUTH_URL}/users`);
     },
     userById: async (args: {id: string}) => {
-      return userModel.findById(args.id);
+      return await fetchData<User>(`${process.env.AUTH_URL}/users/${args.id}`);
     },
   },
   Mutation: {
     register: async (_parent: undefined, args: {user: UserInput}) => {
-      const user: UserInput = {
-        user_name: args.user.user_name!,
-        email: args.user.email!,
-        password: args.user.password!,
-      };
-      const newUser = userModel.create(user);
-      return {user: newUser, message: 'User created'};
+      return await fetchData<UserResponse>(`${process.env.AUTH_URL}/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(args.user),
+      });
+    },
+    login: async (
+      _parent: undefined,
+      args: {credentials: {username: string; password: string}},
+    ) => {
+      return await fetchData<UserResponse>(
+        `${process.env.AUTH_URL}/auth/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(args.credentials),
+        },
+      );
     },
   },
 };

@@ -12,4 +12,21 @@ interface OutputUser {
   email: string;
 }
 
-export {User, OutputUser};
+interface UserInput {
+  user_name: string;
+  email: string;
+  password: string;
+}
+
+interface LoginUser {
+  _id: string;
+  user_name: string;
+  email: string;
+  role: 'user' | 'admin';
+}
+interface ResponseUser {
+  message: string;
+  user: LoginUser;
+}
+
+export {User, OutputUser, UserInput, LoginUser, ResponseUser};

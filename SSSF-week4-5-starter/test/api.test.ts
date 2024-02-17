@@ -76,17 +76,17 @@ describe('Testing graphql api', () => {
   it('should create second user', async () => {
     await postUser(app, testUser2);
   });
-  //
-  // // test login
-  // it('should login user', async () => {
-  //   const vars = {
-  //     credentials: {
-  //       username: testUser.email!,
-  //       password: testUser.password!,
-  //     },
-  //   };
-  //   userData = await loginUser(app, vars);
-  // });
+
+  //test login
+  it('should login user', async () => {
+    const vars = {
+      credentials: {
+        username: testUser.email!,
+        password: testUser.password!,
+      },
+    };
+    userData = await loginUser(app, vars);
+  });
   //
   // // test login with second user
   // it('should login second user', async () => {
@@ -128,7 +128,7 @@ describe('Testing graphql api', () => {
   // it('should return single user', async () => {
   //   await getSingleUser(app, userData.user.id!);
   // });
-  //
+
   // // test update user
   // it('should update user', async () => {
   //   await putUser(app, userData.token!);
