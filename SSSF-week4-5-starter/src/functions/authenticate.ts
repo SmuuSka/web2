@@ -1,5 +1,4 @@
 import {Request} from 'express';
-//import jwt from 'jsonwebtoken';
 import {LoginUser, TokenContent} from '../types/DBTypes';
 import {MyContext} from '../types/MyContext';
 import fetchData from './fetchData';
@@ -9,16 +8,11 @@ export default async (req: Request): Promise<MyContext> => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
     try {
-      // console.log('authHeader', authHeader);
       const token = authHeader.split(' ')[1];
-      // const userFromToken = jwt.verify(
-      //   token,
-      //   process.env.JWT_SECRET as string,
-      // ) as LoginUser;
-      //or check if user is in the auth server database
-      //console.log(token);
+      if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET not defined');
+      console.log('token from 4-5 server: ', token);
       const user = await fetchData<UserResponse>(
-        `${process.env.AUTH_SERVER}/users/token`,
+        `${process.env.AUTH_URL}/users/token`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -28,7 +22,7 @@ export default async (req: Request): Promise<MyContext> => {
       if (!user) {
         return {};
       }
-      // add token to user object so we can use it in resolvers
+      // add token to user object, so we can use it in resolvers
       const tokenContent: TokenContent = {
         token: token,
         user: user.user as LoginUser,

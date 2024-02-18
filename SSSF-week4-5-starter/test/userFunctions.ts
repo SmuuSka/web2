@@ -63,6 +63,7 @@ const getSingleUser = (
           reject(err);
         } else {
           const user = response.body.data.userById;
+          console.log('userByID', user);
           expect(user.id).toBe(id);
           expect(user).toHaveProperty('user_name');
           expect(user).toHaveProperty('email');
@@ -113,10 +114,8 @@ const postUser = (
       })
       .expect(200, (err, response) => {
         if (err) {
-          console.log('error', response.body.errors);
           reject(err);
         } else {
-          console.log('alempi', response.body);
           const userData = response.body.data.register;
           expect(userData).toHaveProperty('message');
           expect(userData).toHaveProperty('user');

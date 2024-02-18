@@ -8,7 +8,13 @@
 // TODO: add function to check if a token is valid
 import {Request, Response, NextFunction} from 'express';
 import userModel from '../models/userModel';
-import {LoginUser, OutputUser, ResponseUser, User, UserInput} from '../../interfaces/User';
+import {
+  LoginUser,
+  OutputUser,
+  ResponseUser,
+  User,
+  UserInput,
+} from '../../interfaces/User';
 import {validationResult} from 'express-validator';
 import CustomError from '../../classes/CustomError';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
@@ -78,10 +84,10 @@ const userPut = async (
   next: NextFunction
 ) => {
   try {
-    const {userFromToken} = res.locals;
+    const userFromToken = res.locals.userFromToken as LoginUser;
     let id: string | undefined = userFromToken._id;
     if (userFromToken.role === 'admin') {
-      id = req.params.id;
+      id = req.params.id!;
     }
     const result = await userModel
       .findByIdAndUpdate(id, req.body, {new: true})
@@ -106,21 +112,22 @@ const userPut = async (
 };
 
 const userDelete = async (
-  req: Request<{id?: string}, {}, UserInput>,
+  req: Request<{id?: string}, {}>,
   res: Response<DBMessageResponse, {userFromToken: LoginUser}>,
   next: NextFunction
 ) => {
   try {
-    const {userFromToken} = res.locals;
+    const userFromToken = res.locals.userFromToken as LoginUser;
     let id: string | undefined = userFromToken._id;
-    if (req.params.id && userFromToken.role === 'admin') {
-      id = req.params.id;
-      console.log('admin', id);
+    if (userFromToken.role === 'admin') {
+      id = req.params.id!;
+      console.log('admin delete user by id', id);
     }
     if (userFromToken.role === 'user') {
       id = userFromToken._id;
       console.log('user', id);
     }
+
     const result = await userModel
       .findByIdAndDelete(id)
       .select('-password -role');
@@ -148,8 +155,14 @@ const checkToken = async (
   res: Response<ResponseUser, {userFromToken: LoginUser}>,
   next: NextFunction
 ) => {
+  const userFromToken = res.locals.userFromToken as LoginUser;
+  console.log('userFromToken', userFromToken._id);
   try {
-    const userData = await userModel.findById(res.locals.userFromToken._id).select('-password -role');
+    const userData = await userModel
+      .findById(userFromToken._id)
+      .select('-password');
+
+    console.log('userData', userData);
     if (!userData) {
       next(new CustomError('User not found', 404));
       return;
@@ -160,7 +173,7 @@ const checkToken = async (
     };
     res.json(message);
   } catch (error) {
-    next(new CustomError('Token not valid', 500));
+    next(new CustomError('Token not valid 4', 500));
   }
 };
 export {check, userListGet, userGet, userPost, userPut, userDelete, checkToken};

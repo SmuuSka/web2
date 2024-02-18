@@ -18,7 +18,7 @@ import authenticate from './functions/authenticate';
 import {makeExecutableSchema} from '@graphql-tools/schema';
 import {applyMiddleware} from 'graphql-middleware';
 import {MyContext} from './types/MyContext';
-import {GraphQLError} from 'graphql';
+//import {GraphQLError} from 'graphql';
 
 const app = express();
 
