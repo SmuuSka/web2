@@ -22,6 +22,7 @@ const uploadPost = async (
     };
     res.json(response);
   } catch (error) {
+    console.log('joku error');
     next(new CustomError((error as Error).message, 400));
   }
 };

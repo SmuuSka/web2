@@ -17,9 +17,14 @@ const fileFilter = (
 const upload = multer({dest: './uploads/', fileFilter});
 const router = express.Router();
 
-// TODO: Add auth middleware
 router
   .route('/')
-  .post(authenticate, upload.single('animal'), makeThumbnail, getCoordinates, uploadPost);
+  .post(
+    authenticate,
+    upload.single('cat'),
+    makeThumbnail,
+    getCoordinates,
+    uploadPost
+  );
 
 export default router;

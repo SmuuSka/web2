@@ -10,6 +10,7 @@ type User = Partial<Document> & {
 };
 
 type UserOutput = Omit<User, 'password' | 'role'>;
+type CatInput = Omit<Cat, 'id'>;
 
 type UserInput = Omit<User, 'id' | 'role'>;
 
@@ -57,4 +58,5 @@ export {
   TokenContent,
   Location,
   LocationInput,
+  CatInput,
 };
