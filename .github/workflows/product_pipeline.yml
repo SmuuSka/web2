@@ -14,18 +14,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          path: ./SSSF-auth-server-starter
-
+        
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20.x
 
       - name: Install Dependencies
-        run: checkout SSSF-auth-server-starter && npm install
+        working-directory: SSSF-auth-server-starter
+        run: npm install
 
       - name: Build
+        working-directory: SSSF-auth-server-starter
         run: npm run build
   
   job_upload_server:
