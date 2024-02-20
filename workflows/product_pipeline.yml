@@ -1,0 +1,84 @@
+name: Product Branch Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  job-auth-server:
+    build-and-deploy:
+      runs-on: ubuntu-latest
+      env:
+        PORT_AUTH: ${{ secrets.PORT_AUTH }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20.x
+
+        - name: Install Dependencies
+          run: checkout SSSF-auth-server-starter && npm install
+
+        - name: Build
+          run: npm run build
+
+  job-upload-server:
+    needs: job-auth-server
+    build-and-deploy:
+      runs-on: ubuntu-latest
+      env:
+        PORT_UPLOAD: ${{ secrets.PORT_UPLOAD }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        AUTH_URL: ${{ secrets.AUTH_SERVER_URL }}
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20.x
+
+        - name: Install Dependencies
+          run: checkout SSSF-upload-server-starter && npm install
+
+        - name: Build
+          run: npm run build
+
+  job-client-sever:
+    needs: [job-auth-server, job-upload-server]
+    build-and-deploy:
+      runs-on: ubuntu-latest
+      env:
+        PORT_CLIENT: ${{ secrets.PORT_CLIENT }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        AUTH_URL: ${{ secrets.AUTH_SERVER_URL }}
+        UPLOAD_URL: ${{ secrets.UPLOAD_SERVER_URL }}
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20.x
+
+        - name: Install Dependencies
+          run: checkout SSSF-client-server-starter && npm install
+
+        - name: Build
+          run: npm run build
+        - name: Test
+          run: npm run test
+          env:
+            SECRET_USERNAME: ${{ secrets.SECRET_USERNAME }}
+            SECRET_PASSWORD: ${{ secrets.SECRET_PASSWORD }}
