@@ -27,6 +27,10 @@ jobs:
       - name: Build
         working-directory: SSSF-auth-server-starter
         run: npm run build
+
+      - name: Start Server
+        working-directory: SSSF-auth-server-starter
+        run: npm start
   
   job_upload_server:
     needs: job_auth_server
@@ -54,6 +58,10 @@ jobs:
         working-directory: SSSF-upload-server-starter
         run: npm run build
 
+      - name: Start Server
+        working-directory: SSSF-upload-server-starter
+        run: npm start
+
   job_client_sever:
     needs: [job_auth_server, job_upload_server]
     runs-on: ubuntu-latest
@@ -80,6 +88,10 @@ jobs:
       - name: Build
         working-directory: SSSF-week4-5-starter
         run: npm run build
+
+      - name: Start Server
+        working-directory: SSSF-week4-5-starter
+        run: npm start
         
       - name: Test
         working-directory: SSSF-week4-5-starter
