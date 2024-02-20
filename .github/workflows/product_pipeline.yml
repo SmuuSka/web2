@@ -51,7 +51,7 @@ jobs:
         run: npm run build
 
   job_client_sever:
-    needs: [job-auth-server, job-upload-server]
+    needs: [job_auth_server, job_upload_server]
     runs-on: ubuntu-latest
     env:
       PORT_CLIENT: ${{ secrets.PORT_CLIENT }}
