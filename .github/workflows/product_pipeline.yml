@@ -47,9 +47,11 @@ jobs:
           node-version: 20.x
       
       - name: Install Dependencies
-        run: checkout SSSF-upload-server-starter && npm install
+        working-directory: SSSF-upload-server-starter
+        run: npm install
 
       - name: Build
+        working-directory: SSSF-upload-server-starter
         run: npm run build
 
   job_client_sever:
@@ -72,11 +74,15 @@ jobs:
           node-version: 20.x
 
       - name: Install Dependencies
-        run: checkout SSSF-client-server-starter && npm install
+        working-directory: SSSF-week4-5-starter
+        run: npm install
 
       - name: Build
+        working-directory: SSSF-week4-5-starter
         run: npm run build
+        
       - name: Test
+        working-directory: SSSF-week4-5-starter
         run: npm run test
         env:
           SECRET_USERNAME: ${{ secrets.SECRET_USERNAME }}
