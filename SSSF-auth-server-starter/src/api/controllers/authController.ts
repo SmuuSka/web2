@@ -1,4 +1,3 @@
-// TODO: Create login controller that creates a jwt token and returns it to the user
 import {Request, Response, NextFunction} from 'express';
 import jwt from 'jsonwebtoken';
 import CustomError from '../../classes/CustomError';

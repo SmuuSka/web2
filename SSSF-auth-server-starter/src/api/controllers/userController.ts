@@ -1,25 +1,9 @@
-// Description: This file contains the functions for the user routes
-// TODO: add function check, to check if the server is alive
-// TODO: add function to get all users
-// TODO: add function to get a user by id
-// TODO: add function to create a user
-// TODO: add function to update a user
-// TODO: add function to delete a user
-// TODO: add function to check if a token is valid
 import {Request, Response, NextFunction} from 'express';
 import userModel from '../models/userModel';
-import {
-  LoginUser,
-  OutputUser,
-  ResponseUser,
-  User,
-  UserInput,
-} from '../../interfaces/User';
-import {validationResult} from 'express-validator';
+import {LoginUser, ResponseUser, UserInput} from '../../interfaces/User';
 import CustomError from '../../classes/CustomError';
 import DBMessageResponse from '../../interfaces/DBMessageResponse';
 import bcrypt from 'bcryptjs';
-import LoginMessageResponse from '../../interfaces/LoginMessageResponse';
 const salt = bcrypt.genSaltSync(12);
 
 const check = (req: Request, res: Response) => {
