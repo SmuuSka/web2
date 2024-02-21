@@ -50,7 +50,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: auth-server
-          path: SSSF-auth-server-starter
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
