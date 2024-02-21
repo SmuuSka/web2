@@ -28,74 +28,116 @@ jobs:
         working-directory: SSSF-auth-server-starter
         run: npm run build
 
-      - name: Start Server
-        working-directory: SSSF-auth-server-starter
-        run: npm start
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+            name: auth-server
+            path: release.zip
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download artifact for deployment job
+        uses: actions/download-artifact@v3
+        with:
+          name: auth-server
+          path: SSSF-auth-server-starter
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E039F08234154018A0BB641D901DC4D6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_76FF87CB157647AA91AE3FEB5CD129B5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DAE3B5EE0BF74082AD07AEF314C23F4C }}
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'web-2-test'
+          slot-name: 'Production'
+          package: .
   
-  job_upload_server:
-    needs: job_auth_server
-    runs-on: ubuntu-latest
-    env:
-      PORT_UPLOAD: ${{ secrets.PORT_UPLOAD }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      AUTH_URL: ${{ secrets.AUTH_SERVER_URL }}
-      
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-      
-      - name: Install Dependencies
-        working-directory: SSSF-upload-server-starter
-        run: npm install
-
-      - name: Build
-        working-directory: SSSF-upload-server-starter
-        run: npm run build
-
-      - name: Start Server
-        working-directory: SSSF-upload-server-starter
-        run: npm start
-
-  job_client_sever:
-    needs: [job_auth_server, job_upload_server]
-    runs-on: ubuntu-latest
-    env:
-      PORT_CLIENT: ${{ secrets.PORT_CLIENT }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      AUTH_URL: ${{ secrets.AUTH_URL }}
-      UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-
-      - name: Install Dependencies
-        working-directory: SSSF-week4-5-starter
-        run: npm install
-
-      - name: Build
-        working-directory: SSSF-week4-5-starter
-        run: npm run build
-
-      - name: Start Server
-        working-directory: SSSF-week4-5-starter
-        run: npm start
-        
-      - name: Test
-        working-directory: SSSF-week4-5-starter
-        run: npm run test
-        env:
-          SECRET_USERNAME: ${{ secrets.SECRET_USERNAME }}
-          SECRET_PASSWORD: ${{ secrets.SECRET_PASSWORD }}
+#  job_upload_server:
+#    needs: job_auth_server
+#    runs-on: ubuntu-latest
+#    env:
+#      PORT_UPLOAD: ${{ secrets.PORT_UPLOAD }}
+#      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+#      AUTH_URL: ${{ secrets.AUTH_SERVER_URL }}
+#
+#    steps:
+#      - name: Checkout Repository
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20.x
+#
+#      - name: Install Dependencies
+#        working-directory: SSSF-upload-server-starter
+#        run: npm install
+#
+#      - name: Build
+#        working-directory: SSSF-upload-server-starter
+#        run: npm run build
+#
+#      - name: Zip artifact for deployment
+#        run: zip release.zip ./* -r
+#
+#      - name: Upload artifact for deployment job
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: upload-server
+#          path: release.zip
+#
+#  job_client_sever:
+#    needs: [job_auth_server, job_upload_server]
+#    runs-on: ubuntu-latest
+#    env:
+#      PORT_CLIENT: ${{ secrets.PORT_CLIENT }}
+#      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+#      AUTH_URL: ${{ secrets.AUTH_URL }}
+#      UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
+#
+#    steps:
+#      - name: Checkout Repository
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20.x
+#
+#      - name: Install Dependencies
+#        working-directory: SSSF-week4-5-starter
+#        run: npm install
+#
+#      - name: Build
+#        working-directory: SSSF-week4-5-starter
+#        run: npm run build
+#
+#      - name: Start Server
+#        working-directory: SSSF-week4-5-starter
+#        run: npm start
+#
+#      - name: Test
+#        working-directory: SSSF-week4-5-starter
+#        run: npm run test
+#        env:
+#          SECRET_USERNAME: ${{ secrets.SECRET_USERNAME }}
+#          SECRET_PASSWORD: ${{ secrets.SECRET_PASSWORD }}
