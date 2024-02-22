@@ -30,7 +30,7 @@ jobs:
         working-directory: SSSF-auth-server-starter
         run: |
           ls -la
-          zip release.zip -r
+          zip release.zip /* -r
           ls -la
 
       - name: Upload artifact for deployment job
