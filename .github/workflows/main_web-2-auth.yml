@@ -34,7 +34,7 @@ jobs:
           ls -la
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: auth-server
           path: release.zip
