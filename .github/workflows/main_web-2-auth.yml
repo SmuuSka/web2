@@ -19,25 +19,24 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build, and test
-        working-directory: ./SSSF-auth-server-starter
+        working-directory: SSSF-auth-server-starter
         run: |
           npm install
           npm run build --if-present
           rm -rf src
 
       - name: Install Dependencies
-        working-directory: ./SSSF-auth-server-starter
+        working-directory: SSSF-auth-server-starter
         run: npm install
 
       - name: Build
-        working-directory: ./SSSF-auth-server-starter
+        working-directory: SSSF-auth-server-starter
         run: npm run build
 
       - name: Zip artifact for deployment
-        working-directory: ./SSSF-auth-server-starter
         run: |
           ls -la
-          zip release.zip ./* -r
+          zip release.zip SSSF-auth-server-starter -r
           ls -la
 
       - name: Upload artifact for deployment job
@@ -45,7 +44,6 @@ jobs:
         with:
           name: auth-server
           path: release.zip
-
 
 #  deploy:
 #    runs-on: ubuntu-latest
