@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: auth-server
-          path: SSSS-auth-server-starter/release.zip
+          path: SSSF-auth-server-starter/release.zip
 
 #  deploy:
 #    runs-on: ubuntu-latest
